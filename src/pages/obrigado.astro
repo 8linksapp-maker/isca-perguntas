@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Pergunta enviada — Bruno Medeiros',
+  url: 'https://links.brunomedeiroseo.com.br/perguntas/obrigado',
+};
+---
+
+<BaseLayout
+  title="Pergunta enviada | Bruno Medeiros"
+  description="Sua pergunta foi enviada com sucesso. Ela pode ser respondida no próximo vídeo do canal do Bruno Medeiros."
+  canonical="https://links.brunomedeiroseo.com.br/perguntas/obrigado"
+  jsonLd={jsonLd}
+>
+  <div class="container" style="padding-block:80px 64px;text-align:center">
+    <div class="card" style="padding:48px 32px">
+      <h1 style="font-size:clamp(26px,5vw,38px)">Pergunta enviada ✅</h1>
+      <p class="muted" style="font-size:17px">
+        Sua pergunta foi enviada com sucesso! Ela será analisada e pode ser
+        respondida no <strong style="color:var(--txt)">próximo vídeo</strong> do canal.
+      </p>
+      <p class="mono muted" style="font-size:13px">// obrigado pela pergunta</p>
+    </div>
+  </div>
+</BaseLayout>

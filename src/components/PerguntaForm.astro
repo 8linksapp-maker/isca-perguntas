@@ -1,0 +1,198 @@
+---
+// Formulário de pergunta — nome + email + cidade + pergunta
+// POST /api/pergunta → { ok: true } | { ok: false, erro }
+---
+
+<form id="pergunta-form" class="card" novalidate>
+  <div class="field">
+    <label for="nome">Nome</label>
+    <input
+      id="nome"
+      name="nome"
+      type="text"
+      autocomplete="name"
+      placeholder="Seu nome"
+      required
+      maxlength="120"
+    />
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      autocomplete="email"
+      placeholder="voce@email.com"
+      required
+      maxlength="254"
+      inputmode="email"
+    />
+  </div>
+
+  <div class="field">
+    <label for="cidade">Cidade</label>
+    <input
+      id="cidade"
+      name="cidade"
+      type="text"
+      autocomplete="address-level2"
+      placeholder="Sua cidade"
+      required
+      maxlength="120"
+    />
+  </div>
+
+  <div class="field">
+    <label for="pergunta">Sua pergunta</label>
+    <textarea
+      id="pergunta"
+      name="pergunta"
+      placeholder="Escreva sua pergunta sobre SEO aqui…"
+      required
+      minlength="5"
+      maxlength="1000"
+      rows="5"
+    ></textarea>
+  </div>
+
+  <p id="form-error" class="error" role="alert" aria-live="polite" hidden></p>
+
+  <button type="submit" class="btn" id="submit-btn">Enviar minha pergunta →</button>
+  <p class="muted small" style="margin-top:12px">
+    Sua pergunta pode ser respondida no próximo vídeo do canal.
+  </p>
+</form>
+
+<style>
+  .field {
+    margin-bottom: 16px;
+  }
+  .small {
+    font-size: 13px;
+  }
+  textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--txt);
+    font-size: 16px;
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.15s ease;
+  }
+  textarea::placeholder {
+    color: var(--gray);
+  }
+  textarea:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  textarea:focus-visible {
+    outline: 2px solid var(--orange-light);
+    outline-offset: 2px;
+    border-color: var(--orange);
+  }
+  textarea[aria-invalid='true'] {
+    border-color: #ff8a7a;
+  }
+  .char-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gray);
+    text-align: right;
+    margin-top: 4px;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('pergunta-form') as HTMLFormElement;
+  const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
+  const btn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const nomeInput = form.nome as HTMLInputElement;
+  const emailInput = form.email as HTMLInputElement;
+  const cidadeInput = form.cidade as HTMLInputElement;
+  const perguntaInput = form.pergunta as HTMLTextAreaElement;
+
+  // contador de caracteres
+  const countEl = document.createElement('p');
+  countEl.className = 'char-count';
+  countEl.setAttribute('aria-hidden', 'true');
+  perguntaInput.insertAdjacentElement('afterend', countEl);
+  const MAX = 1000;
+  function updateCount() {
+    const n = perguntaInput.value.length;
+    countEl.textContent = `${n}/${MAX}`;
+  }
+  perguntaInput.addEventListener('input', updateCount);
+  updateCount();
+
+  function showError(msg: string, campo?: HTMLInputElement | HTMLTextAreaElement) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+    if (campo) {
+      campo.setAttribute('aria-invalid', 'true');
+      campo.focus();
+    }
+  }
+
+  function clearError() {
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+    for (const el of [nomeInput, emailInput, cidadeInput, perguntaInput]) {
+      el.removeAttribute('aria-invalid');
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+
+    const nome = nomeInput.value.trim();
+    const email = emailInput.value.trim();
+    const cidade = cidadeInput.value.trim();
+    const pergunta = perguntaInput.value.trim();
+
+    if (!nome) return showError('Informe seu nome.', nomeInput);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return showError('Informe um email válido.', emailInput);
+    if (!cidade) return showError('Informe sua cidade.', cidadeInput);
+    if (pergunta.length < 5)
+      return showError('Escreva uma pergunta um pouco mais detalhada.', perguntaInput);
+    if (pergunta.length > MAX)
+      return showError(`A pergunta pode ter no máximo ${MAX} caracteres.`, perguntaInput);
+
+    let redirecionando = false;
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    btn.textContent = 'Enviando…';
+
+    try {
+      const res = await fetch('/api/pergunta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, cidade, pergunta }),
+      });
+      const json = (await res.json()) as { ok: boolean; erro?: string };
+
+      if (res.ok && json.ok) {
+        redirecionando = true;
+        window.location.href = '/obrigado';
+        return;
+      }
+      showError(json.erro ?? 'Não foi possível enviar. Tente novamente.');
+    } catch {
+      showError('Erro de conexão. Tente novamente.');
+    } finally {
+      if (!redirecionando) {
+        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
+        btn.textContent = 'Enviar minha pergunta →';
+      }
+    }
+  });
+</script>

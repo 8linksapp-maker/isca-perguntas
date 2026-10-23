@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PerguntaForm from '../components/PerguntaForm.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Perguntas — Bruno Medeiros',
+  url: 'https://links.brunomedeiroseo.com.br/perguntas',
+  description: 'Mande sua pergunta sobre SEO. As melhores são respondidas no próximo vídeo do canal.',
+};
+---
+
+<BaseLayout
+  title="Perguntas sobre SEO — Mande a sua | Bruno Medeiros"
+  description="Tem uma dúvida sobre SEO? Mande sua pergunta e ela pode ser respondida no próximo vídeo do canal do Bruno Medeiros."
+  canonical="https://links.brunomedeiroseo.com.br/perguntas"
+  jsonLd={jsonLd}
+>
+  <div class="container" style="padding-block: 48px 64px">
+    <header class="mono" style="color:var(--gray);font-size:13px;margin-bottom:24px">
+      // Perguntas
+    </header>
+
+    <div class="card" style="padding:40px 32px;text-align:center">
+      <h1 style="font-size:clamp(28px,6vw,44px)">
+        Mande sua pergunta sobre <span style="color:var(--orange)">SEO</span>
+      </h1>
+      <p class="muted" style="font-size:17px">
+        Tem alguma dúvida? Escreva aqui — as melhores perguntas são respondidas
+        no próximo vídeo do canal.
+      </p>
+
+      <PerguntaForm />
+    </div>
+
+    <section style="margin-top:40px;text-align:center">
+      <h2 style="font-size:20px">Como funciona</h2>
+      <ul class="muted beneficios" style="list-style:none;padding:0;text-align:left" aria-label="Como funciona">
+        <li>✍️ Escreva sua pergunta com o máximo de detalhe possível</li>
+        <li>📹 Ela entra na fila das perguntas para o próximo vídeo</li>
+        <li>🎯 Quanto mais específica, maiores as chances de ser escolhida</li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
