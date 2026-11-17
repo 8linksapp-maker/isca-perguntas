@@ -110,6 +110,10 @@
 </style>
 
 <script>
+  import { lerUtms, registrarVisita } from '../lib/utm-client';
+
+  registrarVisita();
+  const utms = lerUtms();
   const form = document.getElementById('pergunta-form') as HTMLFormElement;
   const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
   const btn = document.getElementById('submit-btn') as HTMLButtonElement;
@@ -175,7 +179,7 @@
       const res = await fetch('/api/pergunta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, cidade, pergunta }),
+        body: JSON.stringify({ nome, email, cidade, pergunta, ...utms }),
       });
       const json = (await res.json()) as { ok: boolean; erro?: string };
 

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { supabaseServer } from '../../lib/supabase';
+import { extrairUtms, registrarConversao, utmShape } from '../../lib/utm';
 
 const payloadSchema = z.object({
   nome: z.string().trim().min(1, 'Nome obrigatório').max(120),
@@ -12,11 +13,12 @@ const payloadSchema = z.object({
     .max(254),
   cidade: z.string().trim().min(1, 'Cidade obrigatória').max(120),
   pergunta: z.string().trim().min(5, 'Pergunta muito curta').max(1000),
+  ...utmShape,
 });
 
 /**
  * POST /api/pergunta
- * Body: { nome, email, cidade, pergunta }
+ * Body: { nome, email, cidade, pergunta, utm_source?, utm_medium?, utm_campaign?, utm_term?, utm_content? }
  * Resposta sucesso: { ok: true } (200)
  * Erro: { ok: false, erro: string } (400 | 500)
  *
@@ -50,6 +52,8 @@ export const POST: APIRoute = async ({ request }) => {
       .insert({ nome, email, cidade, pergunta });
 
     if (error) throw error;
+
+    await registrarConversao(email, extrairUtms(parsed.data));
 
     return Response.json({ ok: true }, { status: 200 });
   } catch (err) {
